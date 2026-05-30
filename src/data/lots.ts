@@ -1,37 +1,57 @@
 import type { Lot } from './types';
 
-export const lots: Lot[] = [
-  { id: "lot-f0082", lote: "F 0082", numero: "N. 308", status: "Sem dados", x: 4.6, y: 13.4, width: 5.1, height: 34.3, rotation: -1.2 },
-  { id: "lot-f0081", lote: "F 0081", numero: "N. 318", status: "Sem Contato", x: 9.9, y: 12.5, width: 5.1, height: 35.2, propertyId: "9", rotation: -1.2 },
-  { id: "lot-f0080", lote: "F 0080", numero: "N. 330", status: "Sem Contato", x: 15.2, y: 11.7, width: 5.0, height: 36.0, propertyId: "8", rotation: -1.2 },
-  { id: "lot-f0079", lote: "F 0079", numero: "N. 340", status: "Sem dados", x: 20.4, y: 10.8, width: 5.0, height: 36.8, rotation: -1.2 },
-  { id: "lot-f0078", lote: "F 0078", numero: "N. 352", status: "Fechado", x: 25.7, y: 10.0, width: 5.0, height: 37.6, propertyId: "7", rotation: -1.2 },
-  { id: "lot-f0077", lote: "F 0077", numero: "N. 362", status: "Negociando", x: 30.9, y: 9.2, width: 5.0, height: 38.4, propertyId: "6", rotation: -1.2 },
-  { id: "lot-f0076", lote: "F 0076", numero: "N. 372", status: "Sem Contato", x: 36.2, y: 8.3, width: 5.0, height: 39.2, propertyId: "5", rotation: -1.2 },
-  { id: "lot-f0075", lote: "F 0075", numero: "N. 382", status: "Não Vende", x: 41.4, y: 7.5, width: 5.0, height: 40.0, propertyId: "4", rotation: -1.2 },
-  { id: "lot-f0074", lote: "F 0074", numero: "N. 394", status: "Sem dados", x: 46.7, y: 6.7, width: 5.0, height: 40.8, rotation: -1.2 },
-  { id: "lot-f0073", lote: "F 0073", numero: "N. 406", status: "Fechado", x: 51.9, y: 5.8, width: 5.0, height: 41.6, propertyId: "3", rotation: -1.2 },
-  { id: "lot-f0072", lote: "F 0072", numero: "N. 416", status: "Negociando", x: 57.2, y: 5.0, width: 5.0, height: 42.4, propertyId: "2", rotation: -1.2 },
-  { id: "lot-f0071", lote: "F 0071", numero: "N. 426", status: "Sem Contato", x: 62.4, y: 4.2, width: 5.0, height: 43.2, propertyId: "1", rotation: -1.2 },
-  { id: "lot-f0070", lote: "F 0070", numero: "N. 438", status: "Sem dados", x: 67.7, y: 3.3, width: 5.0, height: 44.0, rotation: -1.2 },
-  { id: "lot-f0069", lote: "F 0069", numero: "N. 448", status: "Sem dados", x: 72.9, y: 2.5, width: 5.0, height: 44.8, rotation: -1.2 },
-  { id: "lot-f0068", lote: "F 0068", numero: "N. 460", status: "Sem dados", x: 78.2, y: 1.7, width: 5.0, height: 45.6, rotation: -1.2 },
-  { id: "lot-f0067", lote: "F 0067", numero: "N. 472", status: "Sem dados", x: 83.4, y: 0.8, width: 5.2, height: 46.4, rotation: -1.2 },
-  { id: "lot-f0066", lote: "F 0066", numero: "N. 484", status: "Sem dados", x: 88.7, y: 0, width: 5.4, height: 47.2, rotation: -1.2 },
-  // Segunda fileira (invertida, base da quadra)
-  { id: "lot-f0083", lote: "F 0083", numero: "N. 306", status: "Sem Contato", x: 4.6, y: 51.0, width: 5.1, height: 34.3, propertyId: "13", rotation: 178.8 },
-  { id: "lot-f0084", lote: "F 0084", numero: "N. 316", status: "Negociando", x: 9.9, y: 51.8, width: 5.1, height: 35.0, propertyId: "12", rotation: 178.8 },
-  { id: "lot-f0085", lote: "F 0085", numero: "N. 328", status: "Sem dados", x: 15.2, y: 52.7, width: 5.0, height: 35.8, rotation: 178.8 },
-  { id: "lot-f0086", lote: "F 0086", numero: "N. 338", status: "Fechado", x: 20.4, y: 53.5, width: 5.0, height: 36.6, propertyId: "11", rotation: 178.8 },
-  { id: "lot-f0087", lote: "F 0087", numero: "N. 348", status: "Sem Contato", x: 25.7, y: 54.4, width: 5.0, height: 37.4, propertyId: "10", rotation: 178.8 },
-  { id: "lot-f0056", lote: "F 0056", numero: "N. 358", status: "Sem dados", x: 30.9, y: 55.2, width: 5.0, height: 38.2, rotation: 178.8 },
-  { id: "lot-f0055", lote: "F 0055", numero: "N. 370", status: "Não Vende", x: 36.2, y: 56.1, width: 5.0, height: 39.0, propertyId: "9", rotation: 178.8 },
-  { id: "lot-f0054", lote: "F 0054", numero: "N. 380", status: "Sem dados", x: 41.4, y: 56.9, width: 5.0, height: 39.8, rotation: 178.8 },
-  { id: "lot-f0053", lote: "F 0053", numero: "N. 392", status: "Sem dados", x: 46.7, y: 57.8, width: 5.0, height: 40.6, rotation: 178.8 },
-  { id: "lot-f0052", lote: "F 0052", numero: "N. 404", status: "Sem dados", x: 51.9, y: 58.6, width: 5.0, height: 41.4, rotation: 178.8 },
-  { id: "lot-f0051", lote: "F 0051", numero: "N. 414", status: "Sem dados", x: 57.2, y: 59.5, width: 5.0, height: 42.2, rotation: 178.8 },
-  { id: "lot-f0050", lote: "F 0050", numero: "N. 424", status: "Sem dados", x: 62.4, y: 60.3, width: 5.0, height: 43.0, rotation: 178.8 },
-  { id: "lot-f0059", lote: "F 0059", numero: "N. 434", status: "Sem dados", x: 67.7, y: 61.2, width: 5.0, height: 43.2, rotation: 178.8 },
-  { id: "lot-f0058", lote: "F 0058", numero: "N. 444", status: "Sem dados", x: 72.9, y: 61.8, width: 5.0, height: 42.0, rotation: 178.8 },
-  { id: "lot-f0057", lote: "F 0057", numero: "N. 456", status: "Sem dados", x: 78.2, y: 61.2, width: 5.0, height: 40.0, rotation: 178.8 },
+// Lotes da QUADRA FISCAL 047097 — R. Maria Fagnani / R. Prof. Aprígio Gonzaga
+// Geometria baseada no mapa cadastral real (2 fileiras, 26 lotes)
+
+export interface CadastralLot {
+  id: string;
+  lote: string;
+  numero: string;
+  status: string;
+  propertyId?: string;
+  row: 'top' | 'bottom';
+  index: number; // posição na fileira (0-based)
+}
+
+export const cadastralLots: CadastralLot[] = [
+  // === FILEIRA SUPERIOR (13 lotes) — topo da quadra ===
+  { id: "f0082", lote: "F 0082", numero: "N. 308", status: "Sem dados", row: "top", index: 0 },
+  { id: "f0081", lote: "F 0081", numero: "N. 318", status: "Sem Contato", propertyId: "9", row: "top", index: 1 },
+  { id: "f0080", lote: "F 0080", numero: "N. 330", status: "Sem Contato", propertyId: "8", row: "top", index: 2 },
+  { id: "f0079", lote: "F 0079", numero: "N. 342", status: "Sem dados", row: "top", index: 3 },
+  { id: "f0283", lote: "F 0283", numero: "N. 344", status: "Sem dados", row: "top", index: 4 },
+  { id: "f0282", lote: "F 0282", numero: "N. 358", status: "Fechado", propertyId: "7", row: "top", index: 5 },
+  { id: "f0077", lote: "F 0077", numero: "N. 368", status: "Negociando", propertyId: "6", row: "top", index: 6 },
+  { id: "f0076", lote: "F 0076", numero: "N. 378", status: "Sem Contato", propertyId: "5", row: "top", index: 7 },
+  { id: "f0075", lote: "F 0075", numero: "N. 384", status: "Não Vende", propertyId: "4", row: "top", index: 8 },
+  { id: "f0074", lote: "F 0074", numero: "N. 394", status: "Sem dados", row: "top", index: 9 },
+  { id: "f0073", lote: "F 0073", numero: "N. 394", status: "Fechado", propertyId: "3", row: "top", index: 10 },
+  { id: "f0072", lote: "F 0072", numero: "N. 394", status: "Negociando", propertyId: "2", row: "top", index: 11 },
+  { id: "f0071", lote: "F 0071", numero: "N. 394", status: "Sem Contato", propertyId: "1", row: "top", index: 12 },
+
+  // === FILEIRA INFERIOR (13 lotes) — base da quadra (3 primeiros recuam = degraus) ===
+  { id: "f0083", lote: "F 0083", numero: "N. 31", status: "Sem Contato", propertyId: "13", row: "bottom", index: 0 },
+  { id: "f0084", lote: "F 0084", numero: "N. 39", status: "Negociando", propertyId: "12", row: "bottom", index: 1 },
+  { id: "f0450", lote: "F 0450", numero: "N. 47", status: "Sem dados", row: "bottom", index: 2 },
+  { id: "f0451", lote: "F 0451", numero: "N. 73", status: "Fechado", propertyId: "11", row: "bottom", index: 3 },
+  { id: "f0087", lote: "F 0087", numero: "N. 85", status: "Sem Contato", propertyId: "10", row: "bottom", index: 4 },
+  { id: "f0086", lote: "F 0086", numero: "N. 85", status: "Sem dados", row: "bottom", index: 5 },
+  { id: "f0172", lote: "F 0172", numero: "N. 91", status: "Negociando", row: "bottom", index: 6 },
+  { id: "f0088", lote: "F 0088", numero: "N. 101", status: "Sem dados", row: "bottom", index: 7 },
+  { id: "f0090", lote: "F 0090", numero: "N. 117", status: "Fechado", row: "bottom", index: 8 },
+  { id: "f0089", lote: "F 0089", numero: "N. 113", status: "Sem Contato", row: "bottom", index: 9 },
+  { id: "f0173", lote: "F 0173", numero: "N. 121", status: "Sem dados", row: "bottom", index: 10 },
+  { id: "f0091", lote: "F 0091", numero: "N. 131", status: "Sem dados", row: "bottom", index: 11 },
+  { id: "f0092", lote: "F 0092", numero: "N. 137", status: "Sem dados", row: "bottom", index: 12 },
 ];
+
+// Manter compatibilidade com o tipo Lot existente
+export const lots: Lot[] = cadastralLots.map(l => ({
+  id: `lot-${l.id}`,
+  lote: l.lote,
+  numero: l.numero,
+  status: l.status,
+  x: 0, y: 0, width: 0, height: 0, // positions handled by SVG layout
+  propertyId: l.propertyId,
+  rotation: 0,
+}));
