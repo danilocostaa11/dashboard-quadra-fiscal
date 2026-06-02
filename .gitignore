@@ -2,4 +2,6 @@ node_modules/
 dist/
 .vite/
 *.log
-assets/ index.dist.html package-lock.json
+assets/
+index.dist.html
+package-lock.json
