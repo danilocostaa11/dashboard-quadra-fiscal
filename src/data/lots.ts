@@ -32,7 +32,9 @@ export interface LotData {
 // ============================================================
 
 function topYAt(x: number): number {
-  return 0 + (x - 6) * (11.5 / 94); // slopes from (6,0) to (100,11.5)
+  // R. Prof. Aprígio Gonzaga runs roughly horizontal
+  // Very slight slope: y≈3 on left, y≈6 on right
+  return 3 + x * 0.03;
 }
 
 function bottomYAt(x: number): number {
@@ -315,11 +317,11 @@ export const lots: LotData[] = [
 // BLOCK OUTLINE
 // ============================================================
 export const blockOutline: [number, number][] = [
-  [0, 2], [2.5, 0.5], [6, 0],
-  [100, 11.5],
+  [0, 3], [0, 3],
+  [100, 6],
   [100, 42], [94, 42], [94, 55], [97.5, 55], [97.5, 100], [93, 100],
   [6, 80], [2.5, 83], [0, 87],
-  [0, 2],
+  [0, 3],
 ];
 
 // ============================================================
