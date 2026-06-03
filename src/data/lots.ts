@@ -61,7 +61,7 @@ function rightXAt(y: number): number {
 // HORIZONTAL LOT ZONE (lower-left: x = 0 to 24)
 // ============================================================
 
-const hzRight = 24; // right edge of horizontal lots
+const hzRight = 6; // right edge of horizontal lots (aligned with top row start)
 
 // 3 horizontal bands (NOT 4)
 // Band 1: F0083 — TALLEST (top of zone to mid)
@@ -179,139 +179,106 @@ export const lots: LotData[] = [
   },
 
   // ============================================================
-  // BOTTOM ROW — VERTICAL LOTS (rest of the block)
+  // BOTTOM ROW — VERTICAL LOTS (aligned with top row columns)
   // ============================================================
 
-  // F0172 (N.91) — behind F0283
-  {
-    id: 'lot-f0172', lote: 'F 0172', numero: 'N. 91', status: 'Em Negociação', row: 'bottom', propertyId: '4',
-    points: [
-      [hzRight, vDivYAt(hzRight)],
-      [hzRight + 5, vDivYAt(hzRight + 5)],
-      [hzRight + 5, bottomYAt(hzRight + 5)],
-      [hzRight, bottomYAt(hzRight)],
-    ],
-  },
+  // Each bottom lot is directly below its corresponding top lot
+  // x-coordinates match the topCols positions
 
-  // F0086 (N.85) — behind F0282
-  {
-    id: 'lot-f0086', lote: 'F 0086', numero: 'N. 85', status: 'Em Negociação', row: 'bottom', propertyId: '6',
-    points: [
-      [hzRight + 5, vDivYAt(hzRight + 5)],
-      [hzRight + 10, vDivYAt(hzRight + 10)],
-      [hzRight + 10, bottomYAt(hzRight + 10)],
-      [hzRight + 5, bottomYAt(hzRight + 5)],
-    ],
-  },
-
-  // F0088 (N.101) — behind F0077
-  {
-    id: 'lot-f0088', lote: 'F 0088', numero: 'N. 101', status: 'Em Negociação', row: 'bottom', propertyId: '1',
-    points: [
-      [hzRight + 10, vDivYAt(hzRight + 10)],
-      [hzRight + 15, vDivYAt(hzRight + 15)],
-      [hzRight + 15, bottomYAt(hzRight + 15)],
-      [hzRight + 10, bottomYAt(hzRight + 10)],
-    ],
-  },
-
-  // F0087 (N.85) — behind F0076
+  // F0087 (N.85) — below F0082 (col 1: x=6-12)
   {
     id: 'lot-f0087', lote: 'F 0087', numero: 'N. 85', status: 'Sem dados', row: 'bottom',
     points: [
-      [hzRight + 15, vDivYAt(hzRight + 15)],
-      [hzRight + 20, vDivYAt(hzRight + 20)],
-      [hzRight + 20, bottomYAt(hzRight + 20)],
-      [hzRight + 15, bottomYAt(hzRight + 15)],
+      [6, vDivYAt(6)], [12, vDivYAt(12)], [12, bottomYAt(12)], [6, bottomYAt(6)],
     ],
   },
 
-  // F0090 (N.117) — behind F0075, TOP of stacked pair
+  // F0086 (N.85) — below F0081 (col 2: x=12-17)
+  {
+    id: 'lot-f0086', lote: 'F 0086', numero: 'N. 85', status: 'Em Negociação', row: 'bottom', propertyId: '6',
+    points: [
+      [12, vDivYAt(12)], [17, vDivYAt(17)], [17, bottomYAt(17)], [12, bottomYAt(12)],
+    ],
+  },
+
+  // F0172 (N.91) — below F0080 (col 3: x=17-22)
+  {
+    id: 'lot-f0172', lote: 'F 0172', numero: 'N. 91', status: 'Em Negociação', row: 'bottom', propertyId: '4',
+    points: [
+      [17, vDivYAt(17)], [22, vDivYAt(22)], [22, bottomYAt(22)], [17, bottomYAt(17)],
+    ],
+  },
+
+  // F0088 (N.101) — below F0079 (col 4: x=22-27)
+  {
+    id: 'lot-f0088', lote: 'F 0088', numero: 'N. 101', status: 'Em Negociação', row: 'bottom', propertyId: '1',
+    points: [
+      [22, vDivYAt(22)], [27, vDivYAt(27)], [27, bottomYAt(27)], [22, bottomYAt(22)],
+    ],
+  },
+
+  // F0090 (N.117) — below F0283 (col 5: x=27-31), TOP of stacked pair
   {
     id: 'lot-f0090', lote: 'F 0090', numero: 'N. 117', status: 'Em Negociação', row: 'bottom', propertyId: '5',
     points: [
-      [hzRight + 20, vDivYAt(hzRight + 20)],
-      [hzRight + 25, vDivYAt(hzRight + 25)],
-      [hzRight + 25, vDivYAt(hzRight + 25) + 8], // shorter, stacked
-      [hzRight + 20, vDivYAt(hzRight + 20) + 8],
+      [27, vDivYAt(27)], [31, vDivYAt(31)], [31, vDivYAt(31) + 8], [27, vDivYAt(27) + 8],
     ],
   },
 
-  // F0089 (N.113) — BOTTOM of stacked pair (below F0090)
+  // F0089 (N.113) — below F0283 (col 5: x=27-31), BOTTOM of stacked pair
   {
     id: 'lot-f0089', lote: 'F 0089', numero: 'N. 113', status: 'Em Negociação', row: 'bottom', propertyId: '3',
     points: [
-      [hzRight + 20, vDivYAt(hzRight + 20) + 8],
-      [hzRight + 25, vDivYAt(hzRight + 25) + 8],
-      [hzRight + 25, bottomYAt(hzRight + 25)],
-      [hzRight + 20, bottomYAt(hzRight + 20)],
+      [27, vDivYAt(27) + 8], [31, vDivYAt(31) + 8], [31, bottomYAt(31)], [27, bottomYAt(27)],
     ],
   },
 
-  // F0173 (N.121) — behind F0074
+  // F0173 (N.121) — below F0282 (col 6: x=31-35)
   {
     id: 'lot-f0173', lote: 'F 0173', numero: 'N. 121', status: 'Em Negociação', row: 'bottom', propertyId: '2',
     points: [
-      [hzRight + 25, vDivYAt(hzRight + 25)],
-      [hzRight + 30, vDivYAt(hzRight + 30)],
-      [hzRight + 30, bottomYAt(hzRight + 30)],
-      [hzRight + 25, bottomYAt(hzRight + 25)],
+      [31, vDivYAt(31)], [35, vDivYAt(35)], [35, bottomYAt(35)], [31, bottomYAt(31)],
     ],
   },
 
-  // F0091 (N.131) — behind F0073
+  // F0091 (N.131) — below F0077 (col 7: x=35-41)
   {
     id: 'lot-f0091', lote: 'F 0091', numero: 'N. 131', status: 'Sem dados', row: 'bottom',
     points: [
-      [hzRight + 30, vDivYAt(hzRight + 30)],
-      [hzRight + 35, vDivYAt(hzRight + 35)],
-      [hzRight + 35, bottomYAt(hzRight + 35)],
-      [hzRight + 30, bottomYAt(hzRight + 30)],
+      [35, vDivYAt(35)], [41, vDivYAt(41)], [41, bottomYAt(41)], [35, bottomYAt(35)],
     ],
   },
 
-  // F0092 (N.137) — behind F0072
+  // F0092 (N.137) — below F0076 (col 8: x=41-47)
   {
     id: 'lot-f0092', lote: 'F 0092', numero: 'N. 137', status: 'Sem dados', row: 'bottom',
     points: [
-      [hzRight + 35, vDivYAt(hzRight + 35)],
-      [hzRight + 40, vDivYAt(hzRight + 40)],
-      [hzRight + 40, bottomYAt(hzRight + 40)],
-      [hzRight + 35, bottomYAt(hzRight + 35)],
+      [41, vDivYAt(41)], [47, vDivYAt(47)], [47, bottomYAt(47)], [41, bottomYAt(41)],
     ],
   },
 
-  // F0093 (N.151) — behind F0071
+  // F0093 (N.151) — below F0075 (col 9: x=47-53)
   {
     id: 'lot-f0093', lote: 'F 0093', numero: 'N. 151', status: 'Sem dados', row: 'bottom',
     points: [
-      [hzRight + 40, vDivYAt(hzRight + 40)],
-      [hzRight + 45, vDivYAt(hzRight + 45)],
-      [hzRight + 45, bottomYAt(hzRight + 45)],
-      [hzRight + 40, bottomYAt(hzRight + 40)],
+      [47, vDivYAt(47)], [53, vDivYAt(53)], [53, bottomYAt(53)], [47, bottomYAt(47)],
     ],
   },
 
-  // F0094 (N.155) — behind F0160
+  // F0094 (N.155) — below F0074 (col 10: x=53-58)
   {
     id: 'lot-f0094', lote: 'F 0094', numero: 'N. 155', status: 'Sem dados', row: 'bottom',
     points: [
-      [hzRight + 45, vDivYAt(hzRight + 45)],
-      [hzRight + 50, vDivYAt(hzRight + 50)],
-      [hzRight + 50, bottomYAt(hzRight + 50)],
-      [hzRight + 45, bottomYAt(hzRight + 45)],
+      [53, vDivYAt(53)], [58, vDivYAt(58)], [58, bottomYAt(58)], [53, bottomYAt(53)],
     ],
   },
 
-  // F0062 (N.165) — behind F0070, far right with stepped boundary
+  // F0062 (N.165) — below F0073+F0072+F0071+F0160+F0070 (cols 11-15: x=58-85)
   {
     id: 'lot-f0062', lote: 'F 0062', numero: 'N. 165', status: 'Sem dados', row: 'bottom',
     points: [
-      [hzRight + 50, vDivYAt(hzRight + 50)],
-      [94, vDivYAt(94)],
-      [rightXAt(55), 55],
-      [rightXAt(bottomYAt(94)), bottomYAt(94)],
-      [hzRight + 50, bottomYAt(hzRight + 50)],
+      [58, vDivYAt(58)], [85, vDivYAt(85)],
+      [85, bottomYAt(85)], [58, bottomYAt(58)],
     ],
   },
 ];
