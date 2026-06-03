@@ -89,23 +89,26 @@ function vDivYAt(x: number): number {
 // Wider: F0082, F0077, F0070, CD 08
 // Narrower: F0283, F0282, F0074, F0073, F0072, F0071
 
+// Top row: 16 lots, more uniform widths like the cadastral map
+// Total span: x=6 (left edge at top) to x=100 (right edge)
+// Average lot width ~5.5%, CD 08 slightly wider at ~8%
 const topCols = [
-  { id: 'lot-f0082', lote: 'F 0082', numero: 'N. 308', status: 'Sem dados', x1: 24, x2: 30 },
-  { id: 'lot-f0081', lote: 'F 0081', numero: 'N. 318', status: 'Sem Contato', x1: 30, x2: 35, propertyId: '9' },
-  { id: 'lot-f0080', lote: 'F 0080', numero: 'N. 330', status: 'Sem Contato', x1: 35, x2: 40, propertyId: '8' },
-  { id: 'lot-f0079', lote: 'F 0079', numero: 'N. 342', status: 'Sem Contato', x1: 40, x2: 44, propertyId: '7' },
-  { id: 'lot-f0283', lote: 'F 0283', numero: 'N. 344', status: 'Sem Contato', x1: 44, x2: 46.5, propertyId: '10' }, // narrow
-  { id: 'lot-f0282', lote: 'F 0282', numero: 'N. 350', status: 'Sem Contato', x1: 46.5, x2: 49 }, // narrow
-  { id: 'lot-f0077', lote: 'F 0077', numero: 'N. 358', status: 'Em Negociação', x1: 49, x2: 56, propertyId: '11' }, // wide
-  { id: 'lot-f0076', lote: 'F 0076', numero: 'N. 368', status: 'Em Negociação', x1: 56, x2: 61, propertyId: '12' },
-  { id: 'lot-f0075', lote: 'F 0075', numero: 'N. 378', status: 'Em Negociação', x1: 61, x2: 66, propertyId: '13' },
-  { id: 'lot-f0074', lote: 'F 0074', numero: 'N. 384', status: 'Sem dados', x1: 66, x2: 69 }, // narrow
-  { id: 'lot-f0073', lote: 'F 0073', numero: 'N. 394', status: 'Sem dados', x1: 69, x2: 72 }, // narrow
-  { id: 'lot-f0072', lote: 'F 0072', numero: 'N. 400', status: 'Sem dados', x1: 72, x2: 75 }, // narrow
-  { id: 'lot-f0071', lote: 'F 0071', numero: 'N. 404', status: 'Sem dados', x1: 75, x2: 78 }, // narrow
-  { id: 'lot-f0160', lote: 'F 0160', numero: 'N. 408', status: 'Sem dados', x1: 78, x2: 82 },
-  { id: 'lot-f0070', lote: 'F 0070', numero: 'N. 414', status: 'Sem dados', x1: 82, x2: 88 }, // wide
-  { id: 'lot-cd08',  lote: 'CD 08',  numero: 'N. 444', status: 'Sem dados', x1: 88, x2: 100 }, // WIDEST
+  { id: 'lot-f0082', lote: 'F 0082', numero: 'N. 308', status: 'Sem dados', x1: 6, x2: 12 },
+  { id: 'lot-f0081', lote: 'F 0081', numero: 'N. 318', status: 'Sem Contato', x1: 12, x2: 17, propertyId: '9' },
+  { id: 'lot-f0080', lote: 'F 0080', numero: 'N. 330', status: 'Sem Contato', x1: 17, x2: 22, propertyId: '8' },
+  { id: 'lot-f0079', lote: 'F 0079', numero: 'N. 342', status: 'Sem Contato', x1: 22, x2: 27, propertyId: '7' },
+  { id: 'lot-f0283', lote: 'F 0283', numero: 'N. 344', status: 'Sem Contato', x1: 27, x2: 31, propertyId: '10' },
+  { id: 'lot-f0282', lote: 'F 0282', numero: 'N. 350', status: 'Sem Contato', x1: 31, x2: 35 },
+  { id: 'lot-f0077', lote: 'F 0077', numero: 'N. 358', status: 'Em Negociação', x1: 35, x2: 41, propertyId: '11' },
+  { id: 'lot-f0076', lote: 'F 0076', numero: 'N. 368', status: 'Em Negociação', x1: 41, x2: 47, propertyId: '12' },
+  { id: 'lot-f0075', lote: 'F 0075', numero: 'N. 378', status: 'Em Negociação', x1: 47, x2: 53, propertyId: '13' },
+  { id: 'lot-f0074', lote: 'F 0074', numero: 'N. 384', status: 'Sem dados', x1: 53, x2: 58 },
+  { id: 'lot-f0073', lote: 'F 0073', numero: 'N. 394', status: 'Sem dados', x1: 58, x2: 63 },
+  { id: 'lot-f0072', lote: 'F 0072', numero: 'N. 400', status: 'Sem dados', x1: 63, x2: 68 },
+  { id: 'lot-f0071', lote: 'F 0071', numero: 'N. 404', status: 'Sem dados', x1: 68, x2: 73 },
+  { id: 'lot-f0160', lote: 'F 0160', numero: 'N. 408', status: 'Sem dados', x1: 73, x2: 78 },
+  { id: 'lot-f0070', lote: 'F 0070', numero: 'N. 414', status: 'Sem dados', x1: 78, x2: 85 },
+  { id: 'lot-cd08',  lote: 'CD 08',  numero: 'N. 444', status: 'Sem dados', x1: 85, x2: 100 },
 ];
 
 export const lots: LotData[] = [
