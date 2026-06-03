@@ -1,310 +1,17 @@
-// Quadra Fiscal 047097 — Lote polygons (percent-based coordinates)
-// All coordinates are percentages of canvas width/height
-// Derived from the official cadastral map of Cid. Patriarca, São Paulo
-// R. Prof. Aprígio Gonzaga (top), R. Maria Fagnani (bottom)
-//
-// GEOMETRIA FIDEDIGNA 5ª REESCRITA:
-// - Lado esquerdo curvo (x oscila entre 0 e 3)
-// - Lado direito com degraus (y=42→94, y=55→97.5)
-// - Fileira frontal (top): 16 lotes com LARGURAS VARIANTES
-//   (CD 08 enorme à direita, F0283/F0282 estreitos no meio)
-// - Fileira traseira (bottom):
-//   CANTO INFERIOR ESQUERDO = 3 faixas HORIZONTAIS:
-//     Faixa 1 (topo): F0083 — mais alta
-//     Faixa 2 (meio): F0084 — intermediária
-//     Faixa 3 (base): F0450 e F0451 LADO A LADO — mais curta
-//   RESTANTE = lotes verticais, F0090/F0089 EMPILHADOS
-// - Linha divisória desce à direita (y=42 esq → y=48 dir)
-// - Colunas NÃO se alinham (staggered)
+// Real polygon data from GeoSampa WFS — Quadra Fiscal 047097
+// Setor Fiscal 047, Quadra 097 — Cidade Patriarca, São Paulo
+// Coordinates: UTM EPSG:31983, normalized to canvas percentage (0-100)
 
-export interface LotData {
+export interface Lot {
   id: string;
-  lote: string;
   numero: string;
-  status: string;
+  lote: string;
+  rua: string;
+  areaTerreno: number;
   points: [number, number][];
-  row: 'top' | 'bottom';
-  propertyId?: string;
+  status: string;
 }
 
-// ============================================================
-// BLOCK BOUNDARIES (from cadastral map)
-// ============================================================
-
-function topYAt(x: number): number {
-  // R. Prof. Aprígio Gonzaga runs roughly horizontal
-  // Very slight slope: y≈3 on left, y≈6 on right
-  return 3 + x * 0.03;
-}
-
-function bottomYAt(x: number): number {
-  if (x >= 6) return 80 + (x - 6) * 0.1;
-  return 80 + (6 - x) * 1.17;
-}
-
-function leftXAt(y: number): number {
-  if (y < 10) return 0;
-  if (y < 30) return 2;
-  if (y < 50) return 0;
-  if (y < 70) return 2;
-  if (y < 85) return 0;
-  return 3;
-}
-
-function rightXAt(y: number): number {
-  if (y < 42) return 100;
-  if (y < 55) return 94;
-  return 97.5;
-}
-
-// ============================================================
-// HORIZONTAL LOT ZONE (lower-left: x = 0 to 24)
-// ============================================================
-
-const hzRight = 6; // right edge of horizontal lots (aligned with top row start)
-
-// 3 horizontal bands (NOT 4)
-// Band 1: F0083 — TALLEST (top of zone to mid)
-// Band 2: F0084 — MEDIUM (mid to lower)
-// Band 3: F0450 + F0451 SIDE BY SIDE (bottom, shortest)
-const hzTop = 47;       // top of zone
-const hzMid1 = 58;      // bottom of F0083 / top of F0450
-const hzMid2 = 68;      // bottom of F0084 / top of F0451
-const hzBottom = 80;    // bottom of zone
-const hzMidX = 12;      // x-divider between F0450 and F0451
-
-// ============================================================
-// VERTICAL LOT ZONE DIVIDER
-// ============================================================
-// Divides top and bottom rows — DESCENDS from left to right
-function vDivYAt(x: number): number {
-  // y = 42 at left (x=24), y = 48 at right (x=100)
-  return 42 + (x - hzRight) * (6 / 76);
-}
-
-// ============================================================
-// TOP ROW — 16 lots with VARIED widths
-// ============================================================
-// Column positions calibrated from cadastral map:
-// Wider: F0082, F0077, F0070, CD 08
-// Narrower: F0283, F0282, F0074, F0073, F0072, F0071
-
-// Top row: 16 lots, more uniform widths like the cadastral map
-// Total span: x=6 (left edge at top) to x=100 (right edge)
-// Average lot width ~5.5%, CD 08 slightly wider at ~8%
-const topCols = [
-  { id: 'lot-f0082', lote: 'F 0082', numero: 'N. 308', status: 'Sem dados', x1: 6, x2: 12 },
-  { id: 'lot-f0081', lote: 'F 0081', numero: 'N. 318', status: 'Sem Contato', x1: 12, x2: 17, propertyId: '9' },
-  { id: 'lot-f0080', lote: 'F 0080', numero: 'N. 330', status: 'Sem Contato', x1: 17, x2: 22, propertyId: '8' },
-  { id: 'lot-f0079', lote: 'F 0079', numero: 'N. 342', status: 'Sem Contato', x1: 22, x2: 27, propertyId: '7' },
-  { id: 'lot-f0283', lote: 'F 0283', numero: 'N. 344', status: 'Sem Contato', x1: 27, x2: 31, propertyId: '10' },
-  { id: 'lot-f0282', lote: 'F 0282', numero: 'N. 350', status: 'Sem Contato', x1: 31, x2: 35 },
-  { id: 'lot-f0077', lote: 'F 0077', numero: 'N. 358', status: 'Em Negociação', x1: 35, x2: 41, propertyId: '11' },
-  { id: 'lot-f0076', lote: 'F 0076', numero: 'N. 368', status: 'Em Negociação', x1: 41, x2: 47, propertyId: '12' },
-  { id: 'lot-f0075', lote: 'F 0075', numero: 'N. 378', status: 'Em Negociação', x1: 47, x2: 53, propertyId: '13' },
-  { id: 'lot-f0074', lote: 'F 0074', numero: 'N. 384', status: 'Sem dados', x1: 53, x2: 58 },
-  { id: 'lot-f0073', lote: 'F 0073', numero: 'N. 394', status: 'Sem dados', x1: 58, x2: 63 },
-  { id: 'lot-f0072', lote: 'F 0072', numero: 'N. 400', status: 'Sem dados', x1: 63, x2: 68 },
-  { id: 'lot-f0071', lote: 'F 0071', numero: 'N. 404', status: 'Sem dados', x1: 68, x2: 73 },
-  { id: 'lot-f0160', lote: 'F 0160', numero: 'N. 408', status: 'Sem dados', x1: 73, x2: 78 },
-  { id: 'lot-f0070', lote: 'F 0070', numero: 'N. 414', status: 'Sem dados', x1: 78, x2: 85 },
-  { id: 'lot-cd08',  lote: 'CD 08',  numero: 'N. 444', status: 'Sem dados', x1: 85, x2: 100 },
-];
-
-export const lots: LotData[] = [
-  // ============================================================
-  // TOP ROW
-  // ============================================================
-  ...topCols.map(col => ({
-    id: col.id,
-    lote: col.lote,
-    numero: col.numero,
-    status: col.status,
-    row: 'top' as const,
-    propertyId: col.propertyId,
-    points: [
-      [col.x1, topYAt(col.x1)] as [number, number],
-      [col.x2, topYAt(col.x2)] as [number, number],
-      [col.x2, vDivYAt(col.x2)] as [number, number],
-      [col.x1, vDivYAt(col.x1)] as [number, number],
-    ],
-  })),
-
-  // ============================================================
-  // BOTTOM ROW — HORIZONTAL LOTS (lower-left)
-  // ============================================================
-
-  // F0083 (N.31) — TALLEST horizontal band
-  {
-    id: 'lot-f0083', lote: 'F 0083', numero: 'N. 31', status: 'Sem dados', row: 'bottom',
-    points: [
-      [leftXAt(hzTop), hzTop],
-      [hzRight, hzTop],
-      [hzRight, hzMid1],
-      [leftXAt(hzMid1), hzMid1],
-    ],
-  },
-
-  // F0084 (N.39) — MEDIUM horizontal band
-  {
-    id: 'lot-f0084', lote: 'F 0084', numero: 'N. 39', status: 'Sem dados', row: 'bottom',
-    points: [
-      [leftXAt(hzMid1), hzMid1],
-      [hzRight, hzMid1],
-      [hzRight, hzMid2],
-      [leftXAt(hzMid2), hzMid2],
-    ],
-  },
-
-  // F0450 (N.47) — SHORT band, LEFT HALF
-  {
-    id: 'lot-f0450', lote: 'F 0450', numero: 'N. 47', status: 'Sem dados', row: 'bottom',
-    points: [
-      [leftXAt(hzMid2), hzMid2],
-      [hzMidX, hzMid2],
-      [hzMidX, hzBottom],
-      [leftXAt(hzBottom), hzBottom],
-    ],
-  },
-
-  // F0451 (N.73) — SHORT band, RIGHT HALF (side-by-side with F0450)
-  {
-    id: 'lot-f0451', lote: 'F 0451', numero: 'N. 73', status: 'Sem dados', row: 'bottom',
-    points: [
-      [hzMidX, hzMid2],
-      [hzRight, hzMid2],
-      [hzRight, bottomYAt(hzRight)],
-      [hzMidX, bottomYAt(hzMidX)],
-    ],
-  },
-
-  // ============================================================
-  // BOTTOM ROW — VERTICAL LOTS (aligned with top row columns)
-  // ============================================================
-
-  // Each bottom lot is directly below its corresponding top lot
-  // x-coordinates match the topCols positions
-
-  // F0087 (N.85) — below F0082 (col 1: x=6-12)
-  {
-    id: 'lot-f0087', lote: 'F 0087', numero: 'N. 85', status: 'Sem dados', row: 'bottom',
-    points: [
-      [6, vDivYAt(6)], [12, vDivYAt(12)], [12, bottomYAt(12)], [6, bottomYAt(6)],
-    ],
-  },
-
-  // F0086 (N.85) — below F0081 (col 2: x=12-17)
-  {
-    id: 'lot-f0086', lote: 'F 0086', numero: 'N. 85', status: 'Em Negociação', row: 'bottom', propertyId: '6',
-    points: [
-      [12, vDivYAt(12)], [17, vDivYAt(17)], [17, bottomYAt(17)], [12, bottomYAt(12)],
-    ],
-  },
-
-  // F0172 (N.91) — below F0080 (col 3: x=17-22)
-  {
-    id: 'lot-f0172', lote: 'F 0172', numero: 'N. 91', status: 'Em Negociação', row: 'bottom', propertyId: '4',
-    points: [
-      [17, vDivYAt(17)], [22, vDivYAt(22)], [22, bottomYAt(22)], [17, bottomYAt(17)],
-    ],
-  },
-
-  // F0088 (N.101) — below F0079 (col 4: x=22-27)
-  {
-    id: 'lot-f0088', lote: 'F 0088', numero: 'N. 101', status: 'Em Negociação', row: 'bottom', propertyId: '1',
-    points: [
-      [22, vDivYAt(22)], [27, vDivYAt(27)], [27, bottomYAt(27)], [22, bottomYAt(22)],
-    ],
-  },
-
-  // F0090 (N.117) — below F0283 (col 5: x=27-31), TOP of stacked pair
-  {
-    id: 'lot-f0090', lote: 'F 0090', numero: 'N. 117', status: 'Em Negociação', row: 'bottom', propertyId: '5',
-    points: [
-      [27, vDivYAt(27)], [31, vDivYAt(31)], [31, vDivYAt(31) + 8], [27, vDivYAt(27) + 8],
-    ],
-  },
-
-  // F0089 (N.113) — below F0283 (col 5: x=27-31), BOTTOM of stacked pair
-  {
-    id: 'lot-f0089', lote: 'F 0089', numero: 'N. 113', status: 'Em Negociação', row: 'bottom', propertyId: '3',
-    points: [
-      [27, vDivYAt(27) + 8], [31, vDivYAt(31) + 8], [31, bottomYAt(31)], [27, bottomYAt(27)],
-    ],
-  },
-
-  // F0173 (N.121) — below F0282 (col 6: x=31-35)
-  {
-    id: 'lot-f0173', lote: 'F 0173', numero: 'N. 121', status: 'Em Negociação', row: 'bottom', propertyId: '2',
-    points: [
-      [31, vDivYAt(31)], [35, vDivYAt(35)], [35, bottomYAt(35)], [31, bottomYAt(31)],
-    ],
-  },
-
-  // F0091 (N.131) — below F0077 (col 7: x=35-41)
-  {
-    id: 'lot-f0091', lote: 'F 0091', numero: 'N. 131', status: 'Sem dados', row: 'bottom',
-    points: [
-      [35, vDivYAt(35)], [41, vDivYAt(41)], [41, bottomYAt(41)], [35, bottomYAt(35)],
-    ],
-  },
-
-  // F0092 (N.137) — below F0076 (col 8: x=41-47)
-  {
-    id: 'lot-f0092', lote: 'F 0092', numero: 'N. 137', status: 'Sem dados', row: 'bottom',
-    points: [
-      [41, vDivYAt(41)], [47, vDivYAt(47)], [47, bottomYAt(47)], [41, bottomYAt(41)],
-    ],
-  },
-
-  // F0093 (N.151) — below F0075 (col 9: x=47-53)
-  {
-    id: 'lot-f0093', lote: 'F 0093', numero: 'N. 151', status: 'Sem dados', row: 'bottom',
-    points: [
-      [47, vDivYAt(47)], [53, vDivYAt(53)], [53, bottomYAt(53)], [47, bottomYAt(47)],
-    ],
-  },
-
-  // F0094 (N.155) — below F0074 (col 10: x=53-58)
-  {
-    id: 'lot-f0094', lote: 'F 0094', numero: 'N. 155', status: 'Sem dados', row: 'bottom',
-    points: [
-      [53, vDivYAt(53)], [58, vDivYAt(58)], [58, bottomYAt(58)], [53, bottomYAt(53)],
-    ],
-  },
-
-  // F0062 (N.165) — below F0073+F0072+F0071+F0160+F0070 (cols 11-15: x=58-85)
-  {
-    id: 'lot-f0062', lote: 'F 0062', numero: 'N. 165', status: 'Sem dados', row: 'bottom',
-    points: [
-      [58, vDivYAt(58)], [85, vDivYAt(85)],
-      [85, bottomYAt(85)], [58, bottomYAt(58)],
-    ],
-  },
-];
-
-// ============================================================
-// BLOCK OUTLINE
-// ============================================================
-export const blockOutline: [number, number][] = [
-  [0, 3], [0, 3],
-  [100, 6],
-  [100, 42], [94, 42], [94, 55], [97.5, 55], [97.5, 100], [93, 100],
-  [6, 80], [2.5, 83], [0, 87],
-  [0, 3],
-];
-
-// ============================================================
-// STREET LABELS
-// ============================================================
-export const streets = [
-  { name: 'R. Prof. Aprígio Gonzaga', position: [50, -2] as [number, number], rotation: 0.5, row: 'top' },
-  { name: 'R. Maria Fagnani', position: [50, 86] as [number, number], rotation: 0.3, row: 'bottom' },
-];
-
-// ============================================================
-// STATUS COLORS
-// ============================================================
 export const statusColors: Record<string, string> = {
   'Em Negociação': '#f59e0b',
   'Sem Contato': '#6b7280',
@@ -316,3 +23,80 @@ export const statusHoverColors: Record<string, string> = {
   'Sem Contato': '#AAAAAA',
   'Sem dados': '#666666',
 };
+
+export const lots: Lot[] = [
+  { id: 'F0000', numero: '0000', lote: 'F0000', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 1398, points: [[14.5, 19.0], [14.5, 19.0], [14.1, 18.9], [13.2, 18.8], [12.3, 18.6], [10.5, 18.4], [9.9, 18.3], [7.5, 17.9], [7.5, 20.3], [7.4, 21.3], [7.3, 24.9], [7.3, 24.9], [5.6, 24.6], [0.0, 23.8], [0.5, 16.9], [0.9, 11.7], [1.1, 9.6], [1.4, 6.6], [1.7, 2.4], [2.0, 0.8], [2.2, 0.4], [2.6, 0.1], [2.9, 0.0], [4.9, 0.2], [6.4, 0.4], [7.4, 0.6], [9.8, 1.0], [12.2, 1.4], [14.5, 1.8], [14.5, 5.1], [14.5, 5.6], [14.5, 12.2], [14.5, 16.1], [14.5, 19.0]], status: 'Sem dados' },
+  { id: 'F0112', numero: '0112', lote: 'F0112', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 201, points: [[14.5, 19.0], [14.9, 19.0], [16.8, 19.3], [17.0, 19.3], [17.0, 16.8], [17.0, 15.2], [17.0, 5.6], [17.0, 2.2], [14.5, 1.8], [14.5, 5.1], [14.5, 5.6], [14.5, 12.2], [14.5, 16.1], [14.5, 19.0]], status: 'Sem dados' },
+  { id: 'F0111', numero: '0111', lote: 'F0111', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 215, points: [[17.0, 2.2], [17.0, 5.6], [17.0, 15.2], [17.0, 16.8], [17.0, 19.3], [18.6, 19.6], [19.7, 19.7], [19.2, 2.5], [17.0, 2.2]], status: 'Sem dados' },
+  { id: 'F0110', numero: '0110', lote: 'F0110', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 215, points: [[19.2, 2.5], [19.7, 19.7], [20.0, 19.8], [22.4, 20.1], [22.3, 18.8], [22.2, 16.1], [22.0, 11.7], [21.7, 5.9], [21.6, 4.9], [21.6, 2.9], [20.1, 2.7], [19.2, 2.5]], status: 'Sem dados' },
+  { id: 'F0109', numero: '0109', lote: 'F0109', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[24.4, 3.3], [23.7, 3.2], [22.9, 3.1], [21.6, 2.9], [21.6, 4.9], [21.7, 5.9], [22.0, 11.7], [22.2, 16.1], [22.3, 18.8], [22.4, 20.1], [22.6, 23.9], [24.1, 24.0], [24.5, 24.1], [25.5, 24.2], [25.1, 17.7], [25.0, 16.1], [24.8, 10.5], [24.7, 9.6], [24.6, 8.3], [24.4, 3.3]], status: 'Sem dados' },
+  { id: 'F0108', numero: '0108', lote: 'F0108', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[25.5, 24.2], [27.2, 24.4], [27.3, 24.4], [28.4, 24.6], [28.3, 22.5], [28.2, 21.9], [28.2, 20.5], [28.1, 19.1], [27.9, 15.8], [27.6, 9.5], [27.5, 6.6], [27.4, 3.8], [24.4, 3.3], [24.6, 8.3], [24.7, 9.6], [24.8, 10.5], [25.0, 16.1], [25.1, 17.7], [25.5, 24.2]], status: 'Sem dados' },
+  { id: 'F0106', numero: '0106', lote: 'F0106', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[25.5, 24.2], [24.5, 24.1], [24.1, 24.0], [22.6, 23.9], [22.9, 28.1], [23.0, 30.6], [25.4, 31.2], [27.2, 31.6], [28.0, 31.8], [30.0, 32.3], [31.9, 32.8], [31.8, 31.2], [31.4, 24.9], [29.1, 24.6], [28.4, 24.6], [27.3, 24.4], [27.2, 24.4], [25.5, 24.2]], status: 'Sem dados' },
+  { id: 'F0204', numero: '0204', lote: 'F0204', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[31.4, 24.9], [30.9, 14.7], [28.7, 15.5], [28.3, 15.7], [27.9, 15.8], [28.1, 19.1], [28.2, 20.5], [28.2, 21.9], [28.3, 22.5], [28.4, 24.6], [29.1, 24.6], [31.4, 24.9]], status: 'Sem dados' },
+  { id: 'F0205', numero: '0205', lote: 'F0205', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[30.9, 14.7], [30.6, 9.6], [30.6, 8.5], [30.4, 5.7], [29.8, 4.1], [27.4, 3.8], [27.5, 6.6], [27.6, 9.5], [27.9, 15.8], [28.3, 15.7], [28.7, 15.5], [30.9, 14.7]], status: 'Sem dados' },
+  { id: 'F0082', numero: '0082', lote: 'F0082', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[34.4, 25.7], [34.9, 25.7], [36.5, 25.9], [37.6, 26.0], [37.1, 19.4], [36.8, 15.3], [36.1, 6.7], [36.0, 5.0], [33.6, 4.5], [33.4, 4.9], [33.2, 6.2], [33.3, 8.0], [33.7, 14.5], [33.8, 16.7], [33.9, 18.4], [34.4, 25.7]], status: 'Sem dados' },
+  { id: 'F0081', numero: '0081', lote: 'F0081', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[38.8, 5.4], [36.0, 5.0], [36.1, 6.7], [36.8, 15.3], [37.1, 19.4], [37.6, 26.0], [39.7, 26.2], [40.5, 26.3], [40.3, 23.0], [39.8, 17.5], [39.0, 7.8], [38.8, 5.4]], status: 'Sem dados' },
+  { id: 'F0083', numero: '0083', lote: 'F0083', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[34.8, 32.4], [36.8, 32.6], [39.1, 33.0], [40.1, 33.1], [41.3, 33.2], [42.1, 33.4], [43.6, 33.5], [43.4, 26.6], [41.5, 26.4], [40.5, 26.3], [39.7, 26.2], [37.6, 26.0], [36.5, 25.9], [34.9, 25.7], [34.4, 25.7], [34.8, 32.4]], status: 'Sem dados' },
+  { id: 'F0080', numero: '0080', lote: 'F0080', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[40.5, 26.3], [41.5, 26.4], [43.4, 26.6], [43.5, 26.6], [43.4, 26.1], [43.2, 23.1], [42.9, 19.3], [42.8, 18.0], [42.7, 17.7], [42.1, 10.3], [41.9, 7.9], [41.7, 5.9], [38.8, 5.4], [39.0, 7.8], [39.8, 17.5], [40.3, 23.0], [40.5, 26.3]], status: 'Sem dados' },
+  { id: 'F0079', numero: '0079', lote: 'F0079', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[43.5, 26.6], [44.3, 26.7], [46.4, 27.1], [46.2, 24.9], [45.3, 14.8], [44.6, 6.3], [44.0, 6.2], [41.7, 5.9], [41.9, 7.9], [42.1, 10.3], [42.7, 17.7], [42.8, 18.0], [42.9, 19.3], [43.2, 23.1], [43.4, 26.1], [43.5, 26.6]], status: 'Sem dados' },
+  { id: 'F0283', numero: '0283', lote: 'F0283', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[46.0, 6.5], [44.6, 6.3], [45.3, 14.8], [46.2, 24.9], [46.4, 27.1], [47.8, 27.3], [46.2, 8.8], [46.0, 6.5]], status: 'Sem dados' },
+  { id: 'F0282', numero: '0282', lote: 'F0282', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[47.5, 6.8], [46.0, 6.5], [46.2, 8.8], [47.8, 27.3], [49.2, 27.6], [48.9, 24.4], [48.9, 23.5], [48.7, 21.7], [48.2, 15.8], [47.8, 10.7], [47.6, 8.1], [47.5, 6.8]], status: 'Sem dados' },
+  { id: 'F0077', numero: '0077', lote: 'F0077', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[50.4, 7.2], [47.5, 6.8], [47.6, 8.1], [47.8, 10.7], [48.2, 15.8], [48.7, 21.7], [48.9, 23.5], [48.9, 24.4], [49.2, 27.6], [50.6, 27.8], [52.0, 28.1], [51.7, 24.0], [51.4, 19.8], [50.9, 13.8], [50.4, 7.2]], status: 'Sem dados' },
+  { id: 'F0076', numero: '0076', lote: 'F0076', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[54.9, 28.5], [54.6, 25.1], [54.5, 23.4], [53.6, 12.0], [53.4, 9.9], [53.2, 7.7], [52.4, 7.5], [50.4, 7.2], [50.9, 13.8], [51.4, 19.8], [51.7, 24.0], [52.0, 28.1], [52.1, 28.1], [52.9, 28.2], [54.9, 28.5]], status: 'Sem dados' },
+  { id: 'F0075', numero: '0075', lote: 'F0075', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[54.9, 28.5], [55.0, 28.6], [57.8, 29.0], [57.6, 25.9], [57.3, 22.2], [56.6, 11.6], [56.3, 8.2], [54.0, 7.8], [53.2, 7.7], [53.4, 9.9], [53.6, 12.0], [54.5, 23.4], [54.6, 25.1], [54.9, 28.5]], status: 'Sem dados' },
+  { id: 'F0074', numero: '0074', lote: 'F0074', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[57.8, 29.0], [59.0, 29.2], [59.1, 29.2], [59.3, 29.3], [59.1, 27.1], [59.1, 26.9], [59.0, 26.4], [57.6, 8.4], [56.3, 8.2], [56.6, 11.6], [57.3, 22.2], [57.6, 25.9], [57.8, 29.0]], status: 'Sem dados' },
+  { id: 'F0073', numero: '0073', lote: 'F0073', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[59.0, 8.6], [57.6, 8.4], [59.0, 26.4], [59.1, 26.9], [59.1, 27.1], [59.3, 29.3], [60.8, 29.5], [60.5, 26.5], [60.4, 25.8], [59.0, 8.6]], status: 'Sem dados' },
+  { id: 'F0072', numero: '0072', lote: 'F0072', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[60.8, 29.5], [61.2, 29.6], [62.2, 29.8], [60.6, 11.3], [60.4, 8.8], [59.0, 8.6], [60.4, 25.8], [60.5, 26.5], [60.8, 29.5]], status: 'Sem dados' },
+  { id: 'F0071', numero: '0071', lote: 'F0071', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[60.4, 8.8], [60.6, 11.3], [62.2, 29.8], [63.6, 30.0], [63.4, 27.5], [63.2, 25.7], [62.7, 19.0], [62.2, 12.2], [61.9, 9.0], [61.5, 9.0], [60.4, 8.8]], status: 'Sem dados' },
+  { id: 'F0180', numero: '0180', lote: 'F0180', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 300, points: [[64.7, 9.4], [61.9, 9.0], [62.2, 12.2], [62.7, 19.0], [63.2, 25.7], [63.4, 27.5], [63.6, 30.0], [65.4, 30.3], [66.2, 30.5], [66.1, 28.3], [66.0, 27.1], [65.3, 17.9], [65.2, 16.4], [64.7, 9.4]], status: 'Sem dados' },
+  { id: 'F0070', numero: '0070', lote: 'F0070', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 150, points: [[66.1, 9.6], [64.7, 9.4], [65.2, 16.4], [65.3, 17.9], [66.0, 27.1], [66.1, 28.3], [66.2, 30.5], [66.5, 30.5], [67.6, 30.7], [67.5, 28.5], [67.4, 27.2], [67.3, 26.1], [66.7, 18.6], [66.3, 12.6], [66.1, 9.6]], status: 'Sem dados' },
+  { id: 'F0000', numero: '0000', lote: 'F0000', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 2112, points: [[81.6, 11.7], [81.6, 11.7], [79.5, 11.4], [78.6, 11.3], [75.0, 10.8], [73.9, 10.7], [73.5, 10.6], [71.8, 10.4], [68.7, 10.0], [67.7, 9.8], [66.1, 9.6], [66.1, 9.6], [66.3, 12.6], [66.7, 18.6], [67.3, 26.1], [67.4, 27.2], [67.5, 28.5], [67.6, 30.7], [69.2, 31.0], [69.6, 35.2], [71.9, 35.0], [72.7, 34.9], [72.7, 34.9], [73.1, 50.9], [78.7, 49.3], [79.3, 41.3], [79.8, 34.6], [80.0, 32.4], [80.0, 32.4], [80.0, 32.2], [80.0, 32.2], [80.4, 27.2], [80.8, 22.2], [81.4, 14.4], [81.6, 12.0], [81.6, 11.7]], status: 'Sem dados' },
+  { id: 'F0189', numero: '0189', lote: 'F0189', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 407, points: [[83.8, 12.1], [81.6, 11.7], [81.6, 12.0], [81.4, 14.4], [80.8, 22.2], [80.4, 27.2], [80.0, 32.2], [80.2, 32.3], [81.5, 32.9], [82.5, 33.4], [82.9, 28.4], [83.2, 23.4], [83.7, 17.2], [83.4, 17.1], [83.8, 12.1]], status: 'Sem dados' },
+  { id: 'F0194', numero: '0194', lote: 'F0194', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 176, points: [[85.2, 41.1], [87.3, 12.6], [84.4, 12.2], [82.9, 31.9], [83.0, 31.9], [82.5, 38.3], [82.3, 41.2], [85.2, 41.1]], status: 'Sem dados' },
+  { id: 'F0744', numero: '0744', lote: 'F0744', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 142, points: [[94.2, 31.8], [94.3, 29.9], [95.2, 16.9], [95.4, 13.8], [93.8, 13.6], [92.5, 31.2], [93.8, 31.7], [94.2, 31.8]], status: 'Sem dados' },
+  { id: 'F0743', numero: '0743', lote: 'F0743', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 143, points: [[97.0, 14.0], [95.4, 13.8], [95.2, 16.9], [94.3, 29.9], [94.2, 31.8], [95.7, 32.5], [95.7, 31.8], [96.6, 19.6], [97.0, 14.0]], status: 'Sem dados' },
+  { id: 'F0053', numero: '0053', lote: 'F0053', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 144, points: [[98.4, 14.1], [97.0, 14.0], [96.6, 19.6], [95.7, 31.8], [95.7, 32.5], [97.2, 33.1], [98.3, 16.7], [98.4, 14.1]], status: 'Sem dados' },
+  { id: 'F0052', numero: '0052', lote: 'F0052', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 171, points: [[98.4, 14.1], [98.3, 16.7], [97.2, 33.1], [98.5, 33.6], [98.8, 33.7], [99.3, 26.3], [99.5, 23.0], [99.8, 17.8], [100.0, 14.3], [99.0, 14.2], [98.4, 14.1]], status: 'Sem dados' },
+  { id: 'F0103', numero: '0103', lote: 'F0103', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[23.7, 41.2], [23.9, 44.6], [27.5, 45.3], [32.6, 46.2], [32.4, 42.8], [29.0, 42.1], [25.1, 41.5], [23.7, 41.2]], status: 'Sem dados' },
+  { id: 'F0105', numero: '0105', lote: 'F0105', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[23.0, 30.6], [23.4, 37.3], [23.4, 37.4], [24.6, 37.7], [25.4, 37.8], [25.5, 37.8], [27.0, 38.1], [27.6, 38.2], [29.7, 38.5], [31.2, 38.8], [32.2, 39.0], [31.9, 34.2], [31.9, 32.8], [30.0, 32.3], [28.0, 31.8], [27.2, 31.6], [25.4, 31.2], [23.0, 30.6]], status: 'Sem dados' },
+  { id: 'F0104', numero: '0104', lote: 'F0104', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[32.2, 39.0], [31.2, 38.8], [29.7, 38.5], [27.6, 38.2], [27.0, 38.1], [25.5, 37.8], [25.4, 37.8], [24.6, 37.7], [23.4, 37.4], [23.6, 39.5], [23.6, 40.6], [23.7, 41.2], [25.1, 41.5], [29.0, 42.1], [32.4, 42.8], [32.3, 40.6], [32.2, 39.0]], status: 'Sem dados' },
+  { id: 'F0296', numero: '0296', lote: 'F0296', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[33.1, 53.7], [32.9, 49.9], [32.0, 49.8], [28.0, 49.0], [25.6, 48.6], [24.1, 48.4], [24.3, 51.8], [24.4, 52.2], [30.0, 53.2], [33.1, 53.7]], status: 'Sem dados' },
+  { id: 'F0297', numero: '0297', lote: 'F0297', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[32.6, 46.2], [27.5, 45.3], [23.9, 44.6], [24.1, 48.4], [25.6, 48.6], [28.0, 49.0], [32.0, 49.8], [32.9, 49.9], [32.6, 46.2]], status: 'Sem dados' },
+  { id: 'F0450', numero: '0450', lote: 'F0450', rua: 'R MARIA FAGNANI', areaTerreno: 219, points: [[41.6, 47.7], [41.6, 46.5], [41.8, 40.6], [39.8, 40.4], [39.7, 40.3], [36.6, 40.0], [36.4, 39.9], [35.2, 39.8], [35.6, 45.4], [36.3, 47.0], [41.6, 47.7], [41.6, 47.7]], status: 'Sem dados' },
+  { id: 'F0084', numero: '0084', lote: 'F0084', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[34.8, 32.4], [34.9, 34.2], [35.0, 36.6], [35.2, 39.8], [36.4, 39.9], [36.6, 40.0], [39.7, 40.3], [39.8, 40.4], [41.8, 40.6], [42.0, 40.6], [43.7, 40.8], [43.9, 40.9], [43.7, 37.0], [43.6, 33.5], [42.1, 33.4], [41.3, 33.2], [40.1, 33.1], [39.1, 33.0], [36.8, 32.6], [34.8, 32.4]], status: 'Sem dados' },
+  { id: 'F0451', numero: '0451', lote: 'F0451', rua: 'R MARIA FAGNANI', areaTerreno: 82, points: [[41.6, 47.7], [42.6, 47.9], [44.1, 48.1], [44.0, 46.9], [43.9, 43.6], [43.9, 40.9], [43.7, 40.8], [42.0, 40.6], [41.8, 40.6], [41.8, 40.6], [41.6, 46.5], [41.6, 47.7]], status: 'Sem dados' },
+  { id: 'F0087', numero: '0087', lote: 'F0087', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[44.1, 48.1], [44.5, 48.1], [44.5, 46.8], [44.4, 43.5], [44.2, 37.0], [44.7, 36.9], [44.8, 36.9], [46.7, 36.6], [46.5, 30.9], [46.4, 27.1], [44.3, 26.7], [43.5, 26.6], [43.4, 26.6], [43.6, 33.5], [43.7, 37.0], [43.9, 40.9], [43.9, 43.6], [44.0, 46.9], [44.1, 48.1]], status: 'Sem dados' },
+  { id: 'F0086', numero: '0086', lote: 'F0086', rua: 'R MARIA FAGNANI', areaTerreno: 150, points: [[46.7, 36.6], [44.8, 36.9], [44.7, 36.9], [44.2, 37.0], [44.4, 43.5], [44.5, 46.8], [44.5, 48.1], [47.0, 48.5], [46.9, 46.4], [46.7, 36.6]], status: 'Sem dados' },
+  { id: 'F0172', numero: '0172', lote: 'F0172', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[49.8, 48.9], [49.7, 44.7], [49.4, 36.9], [49.3, 31.0], [49.2, 27.6], [47.8, 27.3], [46.4, 27.1], [46.5, 30.9], [46.7, 36.6], [46.9, 46.4], [47.0, 48.5], [47.8, 48.6], [49.8, 48.9]], status: 'Sem dados' },
+  { id: 'F0749', numero: '0749', lote: 'F0749', rua: 'R MARIA FAGNANI', areaTerreno: 741, points: [[49.0, 99.4], [51.3, 98.2], [50.9, 92.7], [50.3, 83.6], [50.0, 79.5], [50.5, 79.2], [50.4, 77.7], [50.3, 77.1], [49.7, 69.3], [49.5, 66.8], [48.8, 59.1], [48.5, 55.9], [46.3, 55.5], [44.9, 55.3], [45.8, 67.8], [46.3, 76.7], [47.5, 94.6], [47.8, 100.0], [49.0, 99.4]], status: 'Sem dados' },
+  { id: 'F0748', numero: '0748', lote: 'F0748', rua: 'R MARIA FAGNANI', areaTerreno: 522, points: [[50.5, 79.2], [51.4, 78.8], [52.6, 78.1], [51.9, 68.7], [51.7, 66.9], [51.1, 60.1], [51.0, 58.9], [50.8, 56.2], [48.5, 55.9], [48.8, 59.1], [49.5, 66.8], [49.7, 69.3], [50.3, 77.1], [50.4, 77.7], [50.5, 79.2]], status: 'Sem dados' },
+  { id: 'F0088', numero: '0088', lote: 'F0088', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[52.4, 38.4], [52.1, 28.1], [52.0, 28.1], [50.6, 27.8], [49.2, 27.6], [49.3, 31.0], [49.4, 36.9], [49.7, 44.7], [49.8, 48.9], [50.2, 48.9], [52.8, 49.4], [52.7, 46.6], [52.6, 44.2], [52.6, 42.7], [52.4, 38.4]], status: 'Sem dados' },
+  { id: 'F0175', numero: '0175', lote: 'F0175', rua: 'R MARIA FAGNANI', areaTerreno: 209, points: [[52.6, 78.1], [53.0, 78.6], [54.3, 78.0], [53.7, 68.4], [53.0, 56.6], [50.8, 56.2], [51.0, 58.9], [51.1, 60.1], [51.7, 66.9], [51.9, 68.7], [52.6, 78.1]], status: 'Sem dados' },
+  { id: 'F0089', numero: '0089', lote: 'F0089', rua: 'R MARIA FAGNANI', areaTerreno: 160, points: [[52.4, 38.4], [52.6, 42.7], [52.6, 44.2], [52.7, 46.6], [52.8, 49.4], [55.2, 49.8], [55.1, 46.6], [54.8, 38.0], [53.9, 38.1], [52.4, 38.4]], status: 'Sem dados' },
+  { id: 'F0090', numero: '0090', lote: 'F0090', rua: 'R MARIA FAGNANI', areaTerreno: 170, points: [[55.2, 49.8], [55.6, 49.8], [55.2, 37.2], [55.1, 34.0], [55.0, 28.6], [54.9, 28.5], [52.9, 28.2], [52.1, 28.1], [52.4, 38.4], [53.9, 38.1], [54.8, 38.0], [55.1, 46.6], [55.2, 49.8]], status: 'Sem dados' },
+  { id: 'F0174', numero: '0174', lote: 'F0174', rua: 'R MARIA FAGNANI', areaTerreno: 209, points: [[55.3, 57.0], [53.0, 56.6], [53.7, 68.4], [54.3, 78.0], [55.7, 77.5], [55.9, 77.1], [55.7, 70.3], [55.3, 57.0]], status: 'Sem dados' },
+  { id: 'F0173', numero: '0173', lote: 'F0173', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[55.0, 28.6], [55.1, 34.0], [55.2, 37.2], [55.6, 49.8], [56.9, 50.1], [58.5, 50.3], [57.8, 29.0], [55.0, 28.6]], status: 'Sem dados' },
+  { id: 'F0099', numero: '0099', lote: 'F0099', rua: 'R MARIA FAGNANI', areaTerreno: 244, points: [[57.5, 57.3], [55.3, 57.0], [55.7, 70.3], [55.9, 77.1], [58.2, 76.3], [58.0, 69.8], [57.9, 67.7], [57.6, 59.8], [57.5, 57.3]], status: 'Sem dados' },
+  { id: 'F0098', numero: '0098', lote: 'F0098', rua: 'R MARIA FAGNANI', areaTerreno: 240, points: [[61.3, 75.2], [61.1, 67.8], [61.1, 67.4], [61.0, 61.0], [61.0, 59.8], [60.9, 57.8], [60.1, 57.7], [57.5, 57.3], [57.6, 59.8], [57.9, 67.7], [58.0, 69.8], [58.2, 76.3], [61.3, 75.2]], status: 'Sem dados' },
+  { id: 'F0091', numero: '0091', lote: 'F0091', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[60.8, 29.5], [59.3, 29.3], [59.1, 29.2], [59.0, 29.2], [57.8, 29.0], [58.5, 50.3], [59.8, 50.5], [61.4, 50.8], [61.2, 46.1], [61.2, 45.3], [61.1, 40.8], [61.1, 40.6], [60.8, 29.5]], status: 'Sem dados' },
+  { id: 'F0092', numero: '0092', lote: 'F0092', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[61.4, 50.8], [64.3, 51.3], [64.0, 41.1], [63.9, 38.3], [63.8, 34.7], [63.6, 30.0], [62.2, 29.8], [61.2, 29.6], [60.8, 29.5], [61.1, 40.6], [61.1, 40.8], [61.2, 45.3], [61.2, 46.1], [61.4, 50.8]], status: 'Sem dados' },
+  { id: 'F0097', numero: '0097', lote: 'F0097', rua: 'R MARIA FAGNANI', areaTerreno: 240, points: [[64.8, 58.4], [64.1, 58.3], [62.5, 58.1], [60.9, 57.8], [61.0, 59.8], [61.0, 61.0], [61.1, 67.4], [61.1, 67.8], [61.3, 75.2], [64.8, 73.5], [64.8, 69.9], [64.7, 67.5], [64.8, 58.4]], status: 'Sem dados' },
+  { id: 'F0093', numero: '0093', lote: 'F0093', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[64.3, 51.3], [67.2, 51.8], [67.1, 49.4], [67.0, 45.8], [67.0, 45.2], [66.9, 42.5], [66.7, 35.2], [66.5, 30.5], [66.2, 30.5], [65.4, 30.3], [63.6, 30.0], [63.8, 34.7], [63.9, 38.3], [64.0, 41.1], [64.3, 51.3]], status: 'Sem dados' },
+  { id: 'F0096', numero: '0096', lote: 'F0096', rua: 'R MARIA FAGNANI', areaTerreno: 228, points: [[69.5, 59.1], [64.8, 58.4], [64.7, 67.5], [64.8, 69.9], [64.8, 73.5], [70.2, 70.7], [69.5, 59.1], [69.5, 59.1]], status: 'Sem dados' },
+  { id: 'F0094', numero: '0094', lote: 'F0094', rua: 'R MARIA FAGNANI', areaTerreno: 300, points: [[67.2, 51.8], [69.6, 52.2], [70.2, 52.1], [70.1, 49.6], [69.6, 35.2], [69.2, 31.0], [67.6, 30.7], [66.5, 30.5], [66.7, 35.2], [66.9, 42.5], [67.0, 45.2], [67.0, 45.8], [67.1, 49.4], [67.2, 51.8]], status: 'Sem dados' },
+  { id: 'F0062', numero: '0062', lote: 'F0062', rua: 'R MARIA FAGNANI', areaTerreno: 220, points: [[72.7, 34.9], [71.9, 35.0], [69.6, 35.2], [70.1, 49.6], [70.2, 52.1], [72.7, 51.5], [73.1, 51.8], [72.7, 34.9]], status: 'Sem dados' },
+  { id: 'F0095', numero: '0095', lote: 'F0095', rua: 'R MARIA FAGNANI', areaTerreno: 330, points: [[72.9, 59.5], [70.5, 59.2], [69.5, 59.1], [69.5, 59.1], [70.2, 70.7], [70.3, 70.6], [71.6, 70.0], [72.5, 69.6], [73.1, 69.3], [73.5, 69.2], [74.6, 68.6], [74.2, 62.0], [74.0, 59.6], [72.9, 59.5]], status: 'Sem dados' },
+  { id: 'F0195', numero: '0195', lote: 'F0195', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 650, points: [[85.2, 41.1], [85.2, 41.1], [82.3, 41.2], [83.0, 31.9], [83.0, 31.9], [82.9, 31.9], [84.4, 12.2], [84.4, 12.2], [83.8, 12.1], [83.4, 17.1], [83.7, 17.2], [83.7, 17.2], [83.2, 23.4], [82.9, 28.4], [82.5, 33.4], [81.5, 32.9], [80.2, 32.3], [80.0, 32.2], [80.0, 32.4], [80.0, 32.4], [80.0, 32.4], [79.8, 34.6], [79.3, 41.3], [78.7, 49.3], [78.2, 54.7], [78.2, 60.0], [78.1, 66.1], [79.6, 64.6], [83.3, 61.2], [85.0, 43.1], [85.2, 41.1]], status: 'Sem dados' },
+  { id: 'F0000', numero: '0000', lote: 'F0000', rua: 'R PROF APRIGIO GONZAGA', areaTerreno: 1676, points: [[83.3, 61.2], [90.2, 54.6], [91.2, 53.7], [91.1, 52.0], [91.1, 50.6], [91.5, 44.4], [92.0, 37.7], [92.5, 31.2], [93.8, 13.6], [87.3, 12.6], [85.2, 41.1], [85.0, 43.1], [83.3, 61.2]], status: 'Sem dados' },
+];
+
+export interface Street {
+  name: string;
+  position: [number, number];
+  rotation: number;
+}
+
+export const streets: Street[] = [
+  { name: 'R. Prof. Aprígio Gonzaga', position: [51, -5], rotation: 0 },
+  { name: 'R. Maria Fagnani', position: [53, 105], rotation: 0 },
+];

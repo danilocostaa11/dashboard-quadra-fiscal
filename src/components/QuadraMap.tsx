@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { Canvas, Polygon, Polyline, Text, Line, Path, Group, Rect } from 'fabric';
+import { useEffect, useRef } from 'react';
+import { Canvas, Polygon, Text, Rect } from 'fabric';
 import { lots, statusColors, statusHoverColors, streets } from '../data/lots';
 import { properties } from '../data/properties';
 
@@ -33,85 +33,7 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
     });
     fabricRef.current = canvas;
 
-    // Draw block outline (background fill)
-    const outlinePoints = [
-      // Top-left curve → top edge
-      [px(0), py(2)], [px(2.5), py(0.5)], [px(6), py(0)],
-      [px(15), py(1)], [px(30), py(3)], [px(50), py(6.5)],
-      [px(70), py(9)], [px(85), py(10)], [px(100), py(11.5)],
-      // Right side — stepped
-      [px(100), py(42)],
-      [px(94), py(44)], [px(94), py(55)],
-      [px(97.5), py(55)], [px(97.5), py(100)],
-      // Bottom edge — R. Maria Fagnani
-      [px(85), py(95)], [px(70), py(92)], [px(50), py(90)],
-      [px(30), py(85)], [px(15), py(82)], [px(6), py(80)],
-      // Bottom-left curve
-      [px(3), py(84)], [px(0), py(87)],
-      // Left curve back up
-      [px(0), py(75)], [px(2), py(70)], [px(0), py(60)],
-      [px(2), py(50)], [px(0), py(40)], [px(2), py(30)],
-      [px(0), py(20)], [px(2), py(10)], [px(0), py(2)],
-    ].map(([x, y]) => ({ x, y }));
-
-    const blockOutline = new Polygon(outlinePoints, {
-      fill: '#161b22',
-      stroke: '#30363d',
-      strokeWidth: 2,
-      selectable: false,
-      evented: false,
-    });
-    canvas.add(blockOutline);
-
-    // Draw internal dividing line between top and bottom rows
-    const divLinePoints: [number, number][] = [
-      [6, 47], [13, 47.5], [22, 47], [30, 47], [39, 46.5],
-      [47, 46], [55, 45.5], [62, 45], [72, 44.5], [94, 44],
-    ];
-    const divLine = new Polyline(
-      divLinePoints.map(([x, y]) => ({ x: px(x), y: py(y) })),
-      {
-        stroke: '#30363d',
-        strokeWidth: 1.5,
-        selectable: false,
-        evented: false,
-      }
-    );
-    canvas.add(divLine);
-
-    // Draw secondary horizontal lines in bottom row
-    const bottomMidLine: [number, number][] = [
-      [0, 70], [6, 65], [13, 65], [22, 65], [30, 72],
-      [39, 72], [47, 72], [55, 72], [62, 72], [72, 72], [94, 72],
-    ];
-    const bottomLine = new Polyline(
-      bottomMidLine.map(([x, y]) => ({ x: px(x), y: py(y) })),
-      {
-        stroke: '#30363d',
-        strokeWidth: 1,
-        strokeDashArray: [8, 4],
-        selectable: false,
-        evented: false,
-      }
-    );
-    canvas.add(bottomLine);
-
-    const bottomLowerLine: [number, number][] = [
-      [0, 85], [6, 80], [13, 79], [22, 78.5], [30, 78], [39, 72],
-    ];
-    const bLine = new Polyline(
-      bottomLowerLine.map(([x, y]) => ({ x: px(x), y: py(y) })),
-      {
-        stroke: '#30363d',
-        strokeWidth: 1,
-        strokeDashArray: [8, 4],
-        selectable: false,
-        evented: false,
-      }
-    );
-    canvas.add(bLine);
-
-    // Draw lots as polygons
+    // Draw lots as real polygons from GeoSampa
     const lotShapes = new Map<string, Polygon>();
 
     lots.forEach((lot) => {
@@ -125,8 +47,8 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
 
       const polygon = new Polygon(points, {
         fill: isSelected ? '#3b82f6' : color,
-        stroke: isSelected ? '#60a5fa' : '#0d1117',
-        strokeWidth: isSelected ? 2.5 : 1.5,
+        stroke: isSelected ? '#60a5fa' : '#1a1f2e',
+        strokeWidth: isSelected ? 2.5 : 1,
         selectable: false,
         evented: true,
         hasControls: false,
@@ -144,29 +66,30 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       canvas.add(polygon);
       lotShapes.set(lot.id, polygon);
 
-      // Add lot label
+      // Add lot label at centroid
       const centerX = points.reduce((s, p) => s + p.x, 0) / points.length;
       const centerY = points.reduce((s, p) => s + p.y, 0) / points.length;
 
-      // Number label
+      // Lot number label
       const labelText = new Text(lot.numero, {
         left: centerX,
-        top: centerY - 6,
-        fontSize: 9,
+        top: centerY - 5,
+        fontSize: 8,
         fontFamily: 'Inter, system-ui, sans-serif',
-        fill: '#e5e7eb',
+        fill: '#d1d5db',
         originX: 'center',
         originY: 'center',
         selectable: false,
         evented: false,
       });
 
+      // Lote code label
       const loteText = new Text(lot.lote, {
         left: centerX,
         top: centerY + 6,
-        fontSize: 7,
+        fontSize: 6,
         fontFamily: 'Inter, system-ui, sans-serif',
-        fill: '#9ca3af',
+        fill: '#6b7280',
         originX: 'center',
         originY: 'center',
         selectable: false,
@@ -184,7 +107,7 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       const streetLabel = new Text(street.name, {
         left: px(street.position[0]),
         top: py(street.position[1]),
-        fontSize: 13,
+        fontSize: 12,
         fontFamily: 'Inter, system-ui, sans-serif',
         fill: '#6b7280',
         fontWeight: '600',
@@ -233,7 +156,7 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
     });
 
     // Quadra label
-    const quadraLabel = new Text('Quadra Fiscal 047097 — Cid. Patriarca', {
+    const quadraLabel = new Text('Quadra Fiscal 047097 — Cid. Patriarca (GeoSampa)', {
       left: CANVAS_W - 10,
       top: CANVAS_H - 18,
       fontSize: 10,
@@ -245,6 +168,19 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       evented: false,
     });
     canvas.add(quadraLabel);
+
+    // Data source label
+    const sourceLabel = new Text('Fonte: GeoSampa WFS — polígonos reais', {
+      left: 10,
+      top: CANVAS_H - 18,
+      fontSize: 9,
+      fontFamily: 'Inter, system-ui, sans-serif',
+      fill: '#374151',
+      selectable: false,
+      evented: false,
+      originY: 'center',
+    });
+    canvas.add(sourceLabel);
 
     // Mouse events
     canvas.on('mouse:over', (e) => {
@@ -261,8 +197,8 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       const obj = e.target as any;
       if (obj?._lotId && selectedLot !== obj._lotId) {
         obj.set('fill', obj._fillColor);
-        obj.set('strokeWidth', 1.5);
-        obj.set('stroke', '#0d1117');
+        obj.set('strokeWidth', 1);
+        obj.set('stroke', '#1a1f2e');
         canvas.requestRenderAll();
       }
     });
@@ -297,8 +233,8 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
         shape.set('strokeWidth', 3);
       } else {
         shape.set('fill', obj._fillColor);
-        shape.set('stroke', '#0d1117');
-        shape.set('strokeWidth', 1.5);
+        shape.set('stroke', '#1a1f2e');
+        shape.set('strokeWidth', 1);
       }
     });
     canvas.requestRenderAll();

@@ -3,7 +3,7 @@ import { lots } from '../data/lots';
 
 export default function KPICards() {
   const totalLots = lots.length;
-  const lotsWithData = lots.filter(l => l.propertyId).length;
+  const lotsWithData = properties.length;
   const emNegociacao = properties.filter(p => p.status === 'Em Negociação').length;
   const semContato = properties.filter(p => p.status === 'Sem Contato').length;
   const totalCash = properties.reduce((s, p) => s + p.cash, 0);
