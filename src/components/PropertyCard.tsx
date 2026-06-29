@@ -19,82 +19,133 @@ export default function PropertyCard({ lotId }: PropertyCardProps) {
   const prop = properties.find(p => p.lotId === lotId);
   const lot = lots.find(l => l.id === lotId);
 
-  if (!prop || !lot) {
+  if (!lot) {
     return (
       <div className="property-card empty">
-        <div className="card-icon">📋</div>
-        <h3>Lote sem dados cadastrais</h3>
-        <p>{lot?.lote} — {lot?.numero}</p>
+        <div className="card-icon">❌</div>
+        <h3>Lote não encontrado</h3>
+        <p>{lotId}</p>
       </div>
     );
   }
 
-  const statusColor = prop.status === 'Em Negociação' ? '#f59e0b' : prop.status === 'Sem Contato' ? '#6b7280' : '#374151';
+  // Always show lot data
+  const formatArea = (v: number) => `${v.toLocaleString('pt-BR')} m²`;
 
-  const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v);
+  const streetLabel = lot.rua === 'R PROF APRIGIO GONZAGA'
+    ? 'R. Prof. Aprígio Gonzaga'
+    : lot.rua === 'R MARIA FAGNANI'
+      ? 'R. Maria Fagnani'
+      : lot.rua;
 
+  // If there's a registered property, show full details
+  if (prop) {
+    const statusColor = prop.status === 'Em Negociação' ? '#f59e0b' : prop.status === 'Sem Contato' ? '#6b7280' : '#374151';
+    const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v);
+
+    return (
+      <div className="property-card">
+        <div className="card-header" style={{ borderColor: statusColor }}>
+          <div className="card-header-left">
+            <span className="card-lote">{lot.lote}</span>
+            <span className="card-numero">Nº {lot.numero}</span>
+          </div>
+          <span className="card-status" style={{ backgroundColor: statusColor }}>{prop.status}</span>
+        </div>
+
+        <div className="card-body">
+          <div className="card-row">
+            <label>Endereço</label>
+            <span>{prop.address}</span>
+          </div>
+          <div className="card-row">
+            <label>Inscrição</label>
+            <span>{prop.code}</span>
+          </div>
+          <div className="card-row">
+            <label>Área</label>
+            <span>{prop.area}m²</span>
+          </div>
+          <div className="card-row">
+            <label>Tipo</label>
+            <span>{prop.type === 'casa' ? '🏠 Casa' : '🏗️ Terreno'}</span>
+          </div>
+          <div className="card-row">
+            <label>Preço estimado</label>
+            <span className="price">{formatCurrency(prop.price)}</span>
+          </div>
+
+          <div className="card-divider" />
+
+          <div className="card-row">
+            <label>Proposta MAC</label>
+            <span className="proposal">{prop.propostaMAC}</span>
+          </div>
+          <div className="card-row">
+            <label>Forma pgto</label>
+            <span>{prop.formaPgto}</span>
+          </div>
+          <div className="card-row">
+            <label>Cash</label>
+            <span>{formatCurrency(prop.cash)}</span>
+          </div>
+          {prop.permutaFisica > 0 && (
+            <div className="card-row">
+              <label>Permuta física</label>
+              <span>{formatCurrency(prop.permutaFisica)}</span>
+            </div>
+          )}
+
+          <div className="card-divider" />
+
+          <div className="card-row">
+            <label>Proprietário</label>
+            <span>{prop.owner.name}</span>
+          </div>
+          <div className="card-row">
+            <label>Última ação</label>
+            <span>{prop.owner.action}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // No property data — show lot cadastral info
   return (
     <div className="property-card">
-      <div className="card-header" style={{ borderColor: statusColor }}>
+      <div className="card-header" style={{ borderColor: '#374151' }}>
         <div className="card-header-left">
           <span className="card-lote">{lot.lote}</span>
-          <span className="card-numero">{lot.numero}</span>
+          <span className="card-numero">Nº {lot.numero}</span>
         </div>
-        <span className="card-status" style={{ backgroundColor: statusColor }}>{prop.status}</span>
+        <span className="card-status" style={{ backgroundColor: '#374151' }}>Sem dados</span>
       </div>
 
       <div className="card-body">
         <div className="card-row">
-          <label>Endereço</label>
-          <span>{prop.address}</span>
+          <label>Rua</label>
+          <span>{streetLabel}</span>
         </div>
         <div className="card-row">
-          <label>Inscrição</label>
-          <span>{prop.code}</span>
+          <label>Área do terreno</label>
+          <span>{formatArea(lot.areaTerreno)}</span>
         </div>
         <div className="card-row">
-          <label>Área</label>
-          <span>{prop.area}m²</span>
+          <label>Quadra</label>
+          <span>047/097</span>
         </div>
         <div className="card-row">
-          <label>Tipo</label>
-          <span>{prop.type === 'casa' ? '🏠 Casa' : '🏗️ Terreno'}</span>
-        </div>
-        <div className="card-row">
-          <label>Preço estimado</label>
-          <span className="price">{formatCurrency(prop.price)}</span>
+          <label>Bairro</label>
+          <span>Cid. Patriarca</span>
         </div>
 
         <div className="card-divider" />
 
-        <div className="card-row">
-          <label>Proposta MAC</label>
-          <span className="proposal">{prop.propostaMAC}</span>
-        </div>
-        <div className="card-row">
-          <label>Forma pgto</label>
-          <span>{prop.formaPgto}</span>
-        </div>
-        <div className="card-row">
-          <label>Cash</label>
-          <span>{formatCurrency(prop.cash)}</span>
-        </div>
-        {prop.permutaFisica > 0 && (
-          <div className="card-row">
-            <label>Permuta física</label>
-            <span>{formatCurrency(prop.permutaFisica)}</span>
-          </div>
-        )}
-
-        <div className="card-divider" />
-
-        <div className="card-row">
-          <label>Proprietário</label>
-          <span>{prop.owner.name}</span>
-        </div>
-        <div className="card-row">
-          <label>Última ação</label>
-          <span>{prop.owner.action}</span>
+        <div className="lot-empty-notice">
+          <div className="notice-icon">📝</div>
+          <p>Imóvel ainda não cadastrado neste lote</p>
+          <p className="notice-sub">Cadastre um imóvel para acompanhar negociação</p>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Canvas, Polygon, Text, Rect } from 'fabric';
+import { Canvas, Point, Polygon, Text, Rect } from 'fabric';
 import { lots, statusColors, statusHoverColors, streets } from '../data/lots';
 import { properties } from '../data/properties';
 
@@ -30,8 +30,71 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       height: CANVAS_H,
       backgroundColor: '#0d1117',
       selection: false,
+      stopContextMenu: true,
     });
     fabricRef.current = canvas;
+
+    // --- ZOOM & PAN SETUP ---
+    let isDragging = false;
+    let lastPosX = 0;
+    let lastPosY = 0;
+
+    // Mouse wheel zoom
+    canvas.on('mouse:wheel', (opt) => {
+      const e = opt.e as WheelEvent;
+      const delta = e.deltaY;
+      let zoom = canvas.getZoom();
+      zoom *= 0.999 ** delta;
+      // Clamp zoom between 0.5x and 5x
+      zoom = Math.min(Math.max(0.5, zoom), 5);
+
+      canvas.zoomToPoint(new Point(e.offsetX, e.offsetY), zoom);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    // Pan via middle-click or when no lot is under cursor
+    canvas.on('mouse:down', (opt) => {
+      const evt = opt.e as MouseEvent;
+      // Middle mouse button = pan always
+      if (evt.button === 1) {
+        isDragging = true;
+        lastPosX = evt.clientX;
+        lastPosY = evt.clientY;
+        canvas.selection = false;
+        return;
+      }
+
+      const obj = opt.target as any;
+      if (obj?._lotId) {
+        // Click on a lot → select it
+        onSelectLot(obj._lotId === selectedLot ? null : obj._lotId);
+      } else {
+        // Click on empty space → start panning
+        isDragging = true;
+        lastPosX = evt.clientX;
+        lastPosY = evt.clientY;
+        canvas.selection = false;
+        onSelectLot(null);
+      }
+    });
+
+    canvas.on('mouse:move', (opt) => {
+      if (!isDragging) return;
+      const evt = opt.e as MouseEvent;
+      const vpt = canvas.viewportTransform;
+      if (!vpt) return;
+      vpt[4] += evt.clientX - lastPosX;
+      vpt[5] += evt.clientY - lastPosY;
+      lastPosX = evt.clientX;
+      lastPosY = evt.clientY;
+      canvas.requestRenderAll();
+    });
+
+    canvas.on('mouse:up', () => {
+      isDragging = false;
+      canvas.selection = false;
+    });
 
     // Draw lots as real polygons from GeoSampa
     const lotShapes = new Map<string, Polygon>();
@@ -182,10 +245,10 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
     });
     canvas.add(sourceLabel);
 
-    // Mouse events
+    // Hover events (separate from click)
     canvas.on('mouse:over', (e) => {
       const obj = e.target as any;
-      if (obj?._lotId && selectedLot !== obj._lotId) {
+      if (obj?._lotId && selectedLot !== obj._lotId && !isDragging) {
         obj.set('fill', obj._hoverColor);
         obj.set('strokeWidth', 2.5);
         obj.set('stroke', '#f59e0b');
@@ -203,15 +266,6 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       }
     });
 
-    canvas.on('mouse:down', (e) => {
-      const obj = e.target as any;
-      if (obj?._lotId) {
-        onSelectLot(obj._lotId === selectedLot ? null : obj._lotId);
-      } else {
-        onSelectLot(null);
-      }
-    });
-
     return () => {
       canvas.dispose();
       fabricRef.current = null;
@@ -223,7 +277,6 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
   useEffect(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
-
     lotShapesRef.current.forEach((shape, lotId) => {
       const isSelected = selectedLot === lotId;
       const obj = shape as any;
@@ -242,6 +295,7 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
 
   return (
     <div className="quadra-map-wrapper">
+      <div className="zoom-hint">🔍 Scroll para zoom · Arrastar para mover</div>
       <canvas ref={canvasRef} />
     </div>
   );
