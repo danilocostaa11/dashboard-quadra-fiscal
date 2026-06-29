@@ -4,11 +4,12 @@ import { lots } from '../data/lots';
 
 interface PropertyCardProps {
   lotId: string | null;
+  properties: Property[];
   onUpdate: (lotId: string, updates: Partial<Property>) => void;
   onDelete: (lotId: string) => void;
 }
 
-export default function PropertyCard({ lotId, onUpdate, onDelete }: PropertyCardProps) {
+export default function PropertyCard({ lotId, properties, onUpdate, onDelete }: PropertyCardProps) {
   const [editing, setEditing] = useState(false);
 
   if (!lotId) {
@@ -21,15 +22,7 @@ export default function PropertyCard({ lotId, onUpdate, onDelete }: PropertyCard
     );
   }
 
-  // Get properties from localStorage to stay in sync
-  const STORAGE_KEY = 'dashboard-quadra-properties';
-  let allProps: Property[] = [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) allProps = JSON.parse(raw);
-  } catch { /* ignore */ }
-
-  const prop = allProps.find(p => p.lotId === lotId);
+  const prop = properties.find(p => p.lotId === lotId);
   const lot = lots.find(l => l.id === lotId);
 
   if (!lot) {
@@ -72,7 +65,13 @@ export default function PropertyCard({ lotId, onUpdate, onDelete }: PropertyCard
   }
 
   if (prop) {
-    const statusColor = prop.status === 'Em Negociação' ? '#f59e0b' : prop.status === 'Sem Contato' ? '#6b7280' : '#374151';
+    const statusColorMap: Record<string, string> = {
+      'Em Negociação': '#f59e0b',
+      'Sem Contato': '#6b7280',
+      'Fechado': '#22c55e',
+      'Não Vende': '#ef4444',
+    };
+    const statusColor = statusColorMap[prop.status] || '#374151';
     const formatCurrency = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v);
 
     return (
@@ -125,6 +124,12 @@ export default function PropertyCard({ lotId, onUpdate, onDelete }: PropertyCard
             <div className="card-row">
               <label>Permuta física</label>
               <span>{formatCurrency(prop.permutaFisica)}</span>
+            </div>
+          )}
+          {(prop.cash > 0 || prop.permutaFisica > 0) && (
+            <div className="card-row total-row">
+              <label>Total proposta</label>
+              <span className="price">{formatCurrency(prop.cash + prop.permutaFisica)}</span>
             </div>
           )}
 
@@ -254,10 +259,10 @@ function EditForm({ lotId, lot, prop, streetLabel, onSave, onCancel, onDelete }:
           <div className="form-row">
             <label>Status</label>
             <select value={form.status} onChange={e => set('status', e.target.value)}>
-              <option value="Sem Contato">Sem Contato</option>
-              <option value="Em Negociação">Em Negociação</option>
-              <option value="Fechado">Fechado</option>
-              <option value="Não Vende">Não Vende</option>
+              <option value="Sem Contato">⚪ Sem Contato</option>
+              <option value="Em Negociação">🟡 Em Negociação</option>
+              <option value="Fechado">🟢 Fechado</option>
+              <option value="Não Vende">🔴 Não Vende</option>
             </select>
           </div>
           <div className="form-row">
@@ -329,7 +334,7 @@ function EditForm({ lotId, lot, prop, streetLabel, onSave, onCancel, onDelete }:
         <fieldset>
           <legend>👤 Proprietário</legend>
           <div className="form-row">
-            <label>Nome</label>
+            <label>Namae</label>
             <input type="text" value={form.ownerName} onChange={e => set('ownerName', e.target.value)}
               placeholder="Nome do proprietário" />
           </div>
@@ -339,7 +344,7 @@ function EditForm({ lotId, lot, prop, streetLabel, onSave, onCancel, onDelete }:
         {(form.cash > 0 || form.permutaFisica > 0) && (
           <div className="edit-preview">
             <span>Total proposta:</span>
-            <strong>{fmt(form.cash + form.permutaFisica)}</strong>
+            <strong>{fmt(Number(form.cash) + Number(form.permutaFisica))}</strong>
           </div>
         )}
 

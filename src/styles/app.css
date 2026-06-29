@@ -517,3 +517,162 @@ html, body, #root {
   color: var(--text-muted);
   margin-top: 2px;
 }
+
+/* ── Total Row ────────────────────────────────── */
+
+.total-row {
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 6px;
+  padding: 8px 10px !important;
+  margin-top: 4px;
+}
+
+.total-row .price {
+  font-size: 15px !important;
+}
+
+/* ── Responsive ────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .app {
+    padding: 16px 12px;
+  }
+
+  .app-header h1 {
+    font-size: 20px;
+  }
+
+  .app-header .subtitle {
+    font-size: 12px;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .kpi-card {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .kpi-icon {
+    font-size: 20px;
+  }
+
+  .kpi-value {
+    font-size: 17px;
+  }
+
+  .kpi-label {
+    font-size: 10px;
+  }
+
+  .kpi-sub {
+    font-size: 9px;
+  }
+
+  .map-section {
+    padding: 10px;
+  }
+
+  .zoom-hint {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .details-section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card-header {
+    padding: 10px 12px;
+  }
+
+  .card-lote {
+    font-size: 16px;
+  }
+
+  .card-numero {
+    font-size: 12px;
+  }
+
+  .card-body {
+    padding: 10px 12px;
+  }
+
+  .card-row label {
+    min-width: 90px;
+    font-size: 10px;
+  }
+
+  .card-row span {
+    font-size: 12px;
+  }
+
+  .edit-form fieldset {
+    padding: 10px;
+  }
+
+  .edit-form .form-row.half {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .edit-actions {
+    flex-wrap: wrap;
+  }
+
+  .btn-save, .btn-cancel {
+    flex: 1 1 45%;
+  }
+
+  .btn-delete {
+    flex: 1 1 100%;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: 12px 8px;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .kpi-card {
+    padding: 8px 10px;
+  }
+
+  .kpi-icon {
+    font-size: 18px;
+  }
+
+  .kpi-value {
+    font-size: 15px;
+  }
+
+  .pipeline-stages {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* ── Stage empty ────────────────────────────────── */
+
+.stage-empty {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 8px;
+  text-align: center;
+}

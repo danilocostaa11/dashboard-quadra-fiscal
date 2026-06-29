@@ -16,12 +16,16 @@ export interface Lot {
 export const statusColors: Record<string, string> = {
   'Em Negociação': '#f59e0b',
   'Sem Contato': '#6b7280',
+  'Fechado': '#22c55e',
+  'Não Vende': '#ef4444',
   'Sem dados': '#374151',
 };
 
 export const statusHoverColors: Record<string, string> = {
   'Em Negociação': '#FF8C42',
   'Sem Contato': '#AAAAAA',
+  'Fechado': '#16a34a',
+  'Não Vende': '#dc2626',
   'Sem dados': '#666666',
 };
 

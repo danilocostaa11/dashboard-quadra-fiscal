@@ -82,16 +82,21 @@ export default function App() {
 
       <div className="map-section">
         <div className="map-title">Mapa da Quadra — Clique em um lote para detalhes</div>
-        <QuadraMap selectedLot={selectedLot} onSelectLot={setSelectedLot} />
+        <QuadraMap
+          selectedLot={selectedLot}
+          onSelectLot={setSelectedLot}
+          properties={properties}
+        />
       </div>
 
       <div className="details-section">
         <PropertyCard
           lotId={selectedLot}
+          properties={properties}
           onUpdate={updateProperty}
           onDelete={deleteProperty}
         />
-        <Pipeline />
+        <Pipeline properties={properties} />
       </div>
     </div>
   );
