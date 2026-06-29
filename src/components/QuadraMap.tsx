@@ -133,8 +133,8 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
       const centerX = points.reduce((s, p) => s + p.x, 0) / points.length;
       const centerY = points.reduce((s, p) => s + p.y, 0) / points.length;
 
-      // Lot number label
-      const labelText = new Text(lot.numero, {
+      // F label (lote code) - top line
+      const fLabel = new Text(`F ${lot.numero}`, {
         left: centerX,
         top: centerY - 5,
         fontSize: 8,
@@ -146,21 +146,24 @@ export default function QuadraMap({ selectedLot, onSelectLot }: QuadraMapProps) 
         evented: false,
       });
 
-      // Lote code label
-      const loteText = new Text(lot.lote, {
-        left: centerX,
-        top: centerY + 6,
-        fontSize: 6,
-        fontFamily: 'Inter, system-ui, sans-serif',
-        fill: '#6b7280',
-        originX: 'center',
-        originY: 'center',
-        selectable: false,
-        evented: false,
-      });
+      // N label (número do imóvel) - bottom line, only if exists
+      let nLabel: Text | null = null;
+      if (lot.numImovel) {
+        nLabel = new Text(`N. ${lot.numImovel}`, {
+          left: centerX,
+          top: centerY + 6,
+          fontSize: 7,
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fill: '#9ca3af',
+          originX: 'center',
+          originY: 'center',
+          selectable: false,
+          evented: false,
+        });
+        canvas.add(nLabel);
+      }
 
-      canvas.add(labelText);
-      canvas.add(loteText);
+      canvas.add(fLabel);
     });
 
     lotShapesRef.current = lotShapes;
