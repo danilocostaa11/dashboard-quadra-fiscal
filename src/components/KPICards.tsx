@@ -1,7 +1,11 @@
-import { properties } from '../data/properties';
+import { Property } from '../data/properties';
 import { lots } from '../data/lots';
 
-export default function KPICards() {
+interface KPICardsProps {
+  properties: Property[];
+}
+
+export default function KPICards({ properties }: KPICardsProps) {
   const totalLots = lots.length;
   const lotsWithData = properties.length;
   const emNegociacao = properties.filter(p => p.status === 'Em Negociação').length;
