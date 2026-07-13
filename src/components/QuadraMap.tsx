@@ -56,7 +56,7 @@ export default function QuadraMap({ selectedLot, onSelectLot, properties }: Quad
 
     const wrap = wrapRef.current;
     const wrapWidth = Math.max(320, wrap.clientWidth - 4);
-    const aspect = 1200 / 500;
+    const aspect = 500 / 1200;
     const CW = wrapWidth;
     const CH = Math.round(wrapWidth * aspect);
 
