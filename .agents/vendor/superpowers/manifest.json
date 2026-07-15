@@ -1,0 +1,22 @@
+{
+  "installed_at": "2026-07-15T08:37:47.869587+00:00",
+  "resolved_version": "v6.1.1",
+  "sha256": "8f8e471824842277349ddcd25978f2e6a6655b4bd0735c31465ef30b520c2ba4",
+  "skills": [
+    "brainstorming",
+    "dispatching-parallel-agents",
+    "executing-plans",
+    "finishing-a-development-branch",
+    "receiving-code-review",
+    "requesting-code-review",
+    "subagent-driven-development",
+    "systematic-debugging",
+    "test-driven-development",
+    "using-git-worktrees",
+    "using-superpowers",
+    "verification-before-completion",
+    "writing-plans",
+    "writing-skills"
+  ],
+  "source": "https://github.com/obra/superpowers/archive/refs/tags/v6.1.1.zip"
+}

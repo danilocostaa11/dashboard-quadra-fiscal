@@ -1,0 +1,8 @@
+{
+  "document_count": 0,
+  "embedding": "local-hash-v1",
+  "shards": [],
+  "storage": "sharded-jsonl",
+  "vector_dims": 64,
+  "version": 1
+}
